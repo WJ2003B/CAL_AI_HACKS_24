@@ -48,12 +48,11 @@ def query(prompt: str, image: np.ndarray):
         "max_tokens": 500,
         "temperature": 0.2,
     }
-
   result = client.chat.completions.create(**params)
   return result.choices[0].message.content 
 
 def main(_):
-  im = ...
+  im = FLAGS.im_dir
   prompt = FLAGS.prompt
   return query(prompt, im)
 
