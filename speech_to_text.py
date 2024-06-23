@@ -1,4 +1,5 @@
 import time
+from absl import app
 import azure.cognitiveservices.speech as speechsdk
 
 def configure_speech_recognition():
@@ -19,7 +20,7 @@ def configure_speech_recognition():
     return speech_recognizer, speech_synthesizer
 
 speech_recognizer, speech_synthesizer = configure_speech_recognition()
-def speech_recognize_keyword_from_microphone():
+def speech_recognize_keyword_from_microphone(keyword="assistant"):
     """Performs keyword-triggered speech recognition with input from the microphone"""
     speech_config = speechsdk.SpeechConfig(subscription="a8f58060ddcf4eeebdb3db9a07ca670f", region="eastus")
 
@@ -28,9 +29,6 @@ def speech_recognize_keyword_from_microphone():
     speech_config.speech_recognition_language = "en-US"
 
     model = speechsdk.KeywordRecognitionModel("assistant.table")
-
-    # The phrase your keyword recognition model triggers on.
-    keyword = "assistant"
 
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config)
 
@@ -78,6 +76,14 @@ def speech_recognize_keyword_from_microphone():
 
     return True
 
+def stop_assistant()->bool:
+    return speech_recognize_keyword_from_microphone(keyword="I'm all good now")
+
+def extract_keyword(text: str)->str:
+    txt = text.lower()
+    i = ("colorblind", "vision damage", "glaucoma", "cataracts")
+    return [j for j in i if j in txt][0]
+
 def recognize_speech():
     """Function to recognize speech after keyword detection"""
     speech_config = speechsdk.SpeechConfig(subscription="a8f58060ddcf4eeebdb3db9a07ca670f", region="eastus")
@@ -89,7 +95,6 @@ def recognize_speech():
         wake = speech_recognize_keyword_from_microphone()
         if wake:
             break
-
     speech_recognition_result = speech_recognizer.recognize_once_async().get()
 
     recognized_text = None  # Variable to capture the recognized speech
@@ -108,8 +113,10 @@ def recognize_speech():
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
             print("Error details: {}".format(cancellation_details.error_details))
             print("Did you set the speech resource key and region values?")
-
+    
     return recognized_text
+
+
 
 ###Text to speech###
 
@@ -143,6 +150,10 @@ def speak_text(speech_synthesizer, output_text):
         return ""
 
 # Run the recognize_speech function and capture the output into a variable
-recognized_speech = recognize_speech()
+def main(_):
+    recognized_speech = recognize_speech()
+    speak_text()
 
 
+if __name__ == "__main__":
+    app.run(main)

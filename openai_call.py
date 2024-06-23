@@ -9,14 +9,11 @@ import json
 import time
 import azure.cognitiveservices.speech as speechsdk
 from os import path
-from speech_to_text import recognize_speech, speak_text
-os.environ["OPENAI_API_KEY"] = "sk-proj-ZK8yRRgaBLaIYcTL0uPIT3BlbkFJnpWWmaBJ1IEcYAxm4dTL"
+from speech_to_text import recognize_speech, speak_text, extract_keyword
+
+os.environ["OPENAI_API_KEY"] = ...
 client = openai.OpenAI()
 
-FLAGS = flags.FLAGS
-
-# flags.DEFINE_string("prompt", None, "prompt to be fed into openai", required=True)
-flags.DEFINE_string("im_dir", None, "image directory", required=True)
 
 def read_image(path: str):
   im = Image.open(path)
@@ -55,17 +52,18 @@ def configure_speech_recognition():
 
     return speech_recognizer, speech_synthesizer
 speech_recognizer, speech_synthesizer = configure_speech_recognition()
+
+
 def query(image: np.ndarray):
   with open("additional_prompt.json") as f:
     additional_prompt = json.loads(f.read())
 
-  cb_prompt_additional = str(additional_prompt["Colorblindness"])
-  blindness_prompt_additional = additional_prompt["Vision_damage"]
-  glaucoma_prompt_additional = additional_prompt["Glaucoma"]
-  cataracts_prompt_additional = additional_prompt["Cataracts"]
-
-  speech_text = recognize_speech
+  speech_text = recognize_speech()
   speech_text = str(speech_text)
+  keyword = extract_keyword(speech_text)
+
+  prompt_additional = additional_prompt[keyword]
+
   image_str = encode_image(image)
   #speech 
   messages = [{
@@ -76,7 +74,7 @@ def query(image: np.ndarray):
               {"type": "text",
                "text": speech_text},
                 {"type": "text",
-                 "text": cb_prompt_additional}
+                 "text": prompt_additional}
             ],
         },]
 
@@ -95,12 +93,11 @@ def query(image: np.ndarray):
 
    
 
-def main(_):
-
-  im = FLAGS.im_dir
+def main(im):
   i = query(im)
   print(i)
  
 
 if __name__=="__main__":
-  app.run(main)
+  while True:
+    main("IMG_4015.jpg")
