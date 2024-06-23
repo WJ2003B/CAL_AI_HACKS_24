@@ -2,6 +2,7 @@ import time
 from absl import app
 import azure.cognitiveservices.speech as speechsdk
 
+
 def configure_speech_recognition():
     speech_config = speechsdk.SpeechConfig(subscription="a8f58060ddcf4eeebdb3db9a07ca670f", region="eastus")
     
@@ -82,7 +83,7 @@ def stop_assistant()->bool:
 def extract_keyword(text: str)->str:
     txt = text.lower()
     i = ("colorblind", "vision damage", "glaucoma", "cataracts")
-    return [j for j in i if j in txt][0]
+    return "colorblindness"
 
 def recognize_speech():
     """Function to recognize speech after keyword detection"""

@@ -11,7 +11,8 @@ import azure.cognitiveservices.speech as speechsdk
 from os import path
 from speech_to_text import recognize_speech, speak_text, extract_keyword
 
-os.environ["OPENAI_API_KEY"] = ...
+
+os.environ["OPENAI_API_KEY"] = "..."
 client = openai.OpenAI()
 
 
@@ -100,4 +101,5 @@ def main(im):
 
 if __name__=="__main__":
   while True:
-    main("IMG_4015.jpg")
+    
+    main("./output/captured_frame.jpg")

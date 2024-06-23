@@ -37,7 +37,7 @@ def capture_photos(video_source=0, interval=2, output_folder='output', file_name
         frame_count += 1
 
         # Display the frame (Optional)
-        cv2.imshow('Frame', frame)
+        
 
         # Break the loop if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
