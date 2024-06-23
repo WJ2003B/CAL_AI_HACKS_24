@@ -1,6 +1,24 @@
 import time
 import azure.cognitiveservices.speech as speechsdk
 
+def configure_speech_recognition():
+    speech_config = speechsdk.SpeechConfig(subscription="a8f58060ddcf4eeebdb3db9a07ca670f", region="eastus")
+    
+    speech_config.speech_recognition_language = "en-US"
+    audio_in_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+    audio_out_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
+
+    speech_recognizer = speechsdk.SpeechRecognizer(
+        speech_config=speech_config, audio_config=audio_in_config
+    )
+    speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
+    speech_synthesizer = speechsdk.SpeechSynthesizer(
+        speech_config=speech_config, audio_config=audio_out_config
+    )
+
+    return speech_recognizer, speech_synthesizer
+
+speech_recognizer, speech_synthesizer = configure_speech_recognition()
 def speech_recognize_keyword_from_microphone():
     """Performs keyword-triggered speech recognition with input from the microphone"""
     speech_config = speechsdk.SpeechConfig(subscription="a8f58060ddcf4eeebdb3db9a07ca670f", region="eastus")
@@ -92,6 +110,37 @@ def recognize_speech():
             print("Did you set the speech resource key and region values?")
 
     return recognized_text
+
+###Text to speech###
+
+def speak_text(speech_synthesizer, output_text):
+    # if use_speech set to False do not render speech
+    use_speech = True
+    if use_speech:
+        speech_synthesis_result = speech_synthesizer.speak_text_async(output_text).get()
+
+        if (
+            speech_synthesis_result.reason
+            == speechsdk.ResultReason.SynthesizingAudioCompleted
+        ):
+            # successful conversion to speech
+            # print(f"Speech synthesized for text [{output_text}]")
+            pass
+
+        elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = speech_synthesis_result.cancellation_details
+            print("Speech synthesis canceled: {}".format(cancellation_details.reason))
+
+            if cancellation_details.reason == speechsdk.CancellationReason.Error:
+                if cancellation_details.error_details:
+                    print(
+                        "Error details: {}".format(cancellation_details.error_details)
+                    )
+                    print("Did you set the speech resource key and region values?")
+
+        return speech_synthesis_result
+    else:
+        return ""
 
 # Run the recognize_speech function and capture the output into a variable
 recognized_speech = recognize_speech()
