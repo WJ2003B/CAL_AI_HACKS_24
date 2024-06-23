@@ -12,20 +12,27 @@ client = openai.OpenAI()
 
 FLAGS = flags.FLAGS
 
-FLAGS.define_STRING("prompt", None, "prompt to be fed into openai", required=True)
-FLAGS.define_STRING("im_dir", None, "image directory", required=True)
+flags.DEFINE_string("prompt", None, "prompt to be fed into openai", required=True)
+flags.DEFINE_string("im_dir", None, "image directory", required=True)
 
 def read_image(path: str):
   im = Image.open(path)
   im_np = np.array(im)
   return im_np
 
-def encode_image(im: np.ndarray):
+def encode_image(im):
   if isinstance(im, np.ndarray):
-      im = Image.fromarray(im)
-      buf = io.BytesIO()
-      im.save(buf, format='JPEG')
-      return base64.b64encode(buf.getvalue()).decode('utf-8')
+    im = Image.fromarray(im)
+    buf = io.BytesIO()
+    im.save(buf, format='JPEG')
+    return base64.b64encode(buf.getvalue()).decode('utf-8')
+  elif isinstance(im, str):
+    im = Image.open(im)
+    im = np.array(im)
+    im = Image.fromarray(im)
+    buf = io.BytesIO()
+    im.save(buf, format='JPEG')
+    return base64.b64encode(buf.getvalue()).decode('utf-8')
   else:
     raise NotImplementedError("You should use a np array.")
 
