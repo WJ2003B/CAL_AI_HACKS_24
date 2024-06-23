@@ -5,6 +5,7 @@ import os
 import io
 import base64
 from PIL import Image
+import json
 
 
 os.environ["OPENAI_API_KEY"] = "sk-proj-ZK8yRRgaBLaIYcTL0uPIT3BlbkFJnpWWmaBJ1IEcYAxm4dTL"
@@ -37,6 +38,15 @@ def encode_image(im):
     raise NotImplementedError("You should use a np array.")
 
 def query(prompt: str, image: np.ndarray):
+  with open("additional_prompt.json") as f:
+    additional_prompt = json.loads(f.read())
+
+  cb_prompt_additional = additional_prompt["Colorblindness"]
+  blindness_prompt_additional = additional_prompt["Vision_damage"]
+  glaucoma_prompt_additional = additional_prompt["Glaucoma"]
+  cataracts_prompt_additional = additional_prompt["Cataracts"]
+
+
   image_str = encode_image(image)
   
   messages = [{
@@ -61,7 +71,8 @@ def query(prompt: str, image: np.ndarray):
 def main(_):
   im = FLAGS.im_dir
   prompt = FLAGS.prompt
-  return query(prompt, im)
+  i = query(prompt, im)
+  print(i)
 
 if __name__=="__main__":
   app.run(main)
