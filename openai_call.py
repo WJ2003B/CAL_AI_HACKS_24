@@ -1,6 +1,8 @@
 from absl import flags, app, logging
 import numpy as np
 import openai
+from PIL import Image
+
 
 os.environ["OPENAI_API_KEY"] = ...
 client = openai.OpenAI()
@@ -8,6 +10,11 @@ client = openai.OpenAI()
 FLAGS = flags.FLAGS
 
 FLAGS.define_STRING("prompt", None, "prompt to be fed into openai", required=True)
+
+def read_image(path: str):
+  im = Image.open(path)
+  im_np = np.array(im)
+  return im_np
 
 def encode_image(image: np.ndarray):
   if isinstance(im, np.ndarray):
